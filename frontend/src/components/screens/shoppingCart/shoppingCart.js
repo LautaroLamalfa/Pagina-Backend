@@ -12,7 +12,7 @@ export const Cart = () => {
                 <div className="shoppingcart_right">
                     <div className='shoppingcart_info'>
                         <p>Subtotal (0) items</p>
-                        <p>$499.99s</p>
+                        <p>$499.99</p>
                     </div>
                     <div>
                         <button>Gracias Por Comprar</button>

@@ -1,2 +1,39 @@
-/* .cartitem {;
-} */
+.cartitem {
+  width: 100%;
+  padding: 1rem;
+  margin-bottom: 8px;
+  display: grid;
+  grid-template-columns: 1fr 4fr 1fr 1fr 1fr;
+  background-color: deepskyblue;
+  border-radius: 2px;
+  place-items: center;
+}
+
+.cartitem_name {
+  text-decoration: none;
+  color: #171717;
+}
+
+.cartitem_name:hover {
+  color: rgb(221, 72, 102);
+}
+
+.cartitem_select {
+  padding: 10px 17px;
+}
+
+.cartitem_deleteBtn {
+  padding: 10px 17px;
+  color: cornflowerblue;
+  background-color: aliceblue;
+  border: 1px solid #171717;
+  cursor: pointer;
+  transition: all 0.3s ease-out;
+}
+
+.cartitem_deleteBtn:hover,
+.cartitem_deleteBtn:focus,
+.cartitem_deleteBtn:active {
+  background-color: #171717;
+  transform: scale(1.2);
+}

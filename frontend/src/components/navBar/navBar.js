@@ -20,7 +20,7 @@ export const NavBar = () => {
                         </NavLink>
                     </li> */}
                     <li>
-                        <NavLink to="/cart" className="cart_link">
+                        <NavLink to="/shoppingcart" className="cart_link">
                         <i className='fas fa-shopping-cart'></i>
                             <span>
                                 Cart
