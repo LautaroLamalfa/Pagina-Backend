@@ -1,12 +1,22 @@
 const express = require("express");
-const cluster = require("cluster")
 const compression = require("compression");
-const connectDB = require("./config/config")
 const cors = require("cors")
-const productsRoute = require("./routes/server")
+const mongoose = require("mongoose")
+const productsRoute = require("./routes/product")
+const register = require("./routes/user")
+const cartRoute = require("./routes/cart")
+const orderRoute = require("./routes/order")
 require("dotenv").config();
-connectDB()
 
+const PORT = process.env.PORT || 8085
+
+mongoose.connect(
+    process.env.MONGODB, {
+        useNewUrlParser:true,
+        useUnifiedTopology:true
+    }).then(() => console.log("DB conectada, que bien!"))
+      .catch((Error) => (console.error("DB no conectada, que mal" + Error)
+));
 const app = express();
 
 app.use(express.json())
@@ -14,32 +24,18 @@ app.use(express.urlencoded({ extended: true }))
 app.use(compression())
 app.use(cors())
 app.use('/api', productsRoute)
+app.use('/auth', register)
+app.use('/api/cart', cartRoute)
+app.use('/api/order', orderRoute)
 
-const PORT = parseInt(process.argv[2]) || 8085
-const modoCLuster = process.argv[3] == "CLUSTER"
+app.get("/", (req, res) => {
+    res.send("Hola Servidor " + process.pid);    
+})
 
-if (modoCLuster && cluster.isPrimary) {
+app.listen(PORT, () => {
+    console.log(`Servidor ${process.pid}, Host ${process.env.HOST} http://localhost:${PORT}`);
+})
 
-    cluster.fork()
-
-    cluster.on('exit', Worker => {
-        console.log('Worker', Worker.process.pid, 'died');
-        cluster.fork()
-    })
-} else {
-    app.get("/", (req, res) => {
-        if (process.env.NODE_ENV === "PR") {
-            res.send(`Hola a todos ${process.pid}`)
-
-            console.log(req.headers)
-        }
-    });
-
-    app.listen(PORT, () => {
-        console.log(`Servidor ${process.pid}, Host ${process.env.HOST} http://localhost:${PORT}`);
-    })
-
-}
 
 
 

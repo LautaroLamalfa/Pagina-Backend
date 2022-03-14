@@ -9,7 +9,13 @@ const productSchema = new Schema({
         type:Number,
         default:0
     },
-    imagen:String
+    imagen:String,
+    descripción: {
+        type: String,
+        required: true
+    },
+    categorías: { type: Array}
+    
 })
 
 const Product = model('productos', productSchema)
