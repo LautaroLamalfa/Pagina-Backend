@@ -1,79 +1,78 @@
-const Product = require("../models/productsData")
+const ProductosDao = require('../models/productsData');
+const logs = require ('../logs/log4')
+
+const logError = logs.getLogger("error");
+
+let prod = new ProductosDao()
 
 // GET ALL
 
-const getAllProducts = async (req, res) => {
-    const qNew = req.query.new;
-    const qCategory = req.query.category; 
+const getAllProducts = async () => {
     try {
-        let products;
-
-        if (qNew) {
-            products = await Product.find().sort({createdAt: -1}).limit(5)
-        } else if(qCategory){
-            products = await Product.find({categorías: {
-                $in: [qCategory],
-            },
-        });
-    
-        } else {
-            products = await Product.find()
-        }
-
-        res.status(200).json(products)
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({message: "No se pudo conseguir todos los productos"})
-    }
+        const response = await prod.leerALL();
+        return response;
+      } catch (error) {
+        logError.error(error);
+      }
 }
 
 // GET ONE
 
-const getOneProduct = async (req, res) => {
+const getOneProduct = async (id) => {
     try {
-        const product = await Product.findById(req.params.id);
-
-        res.json(product)
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({message: "No se pudo conseguir el producto"})
-    }
+        const prodId = await prod.leerId(id);
+        if (Object.keys(prodId).length != 0) {
+          return {producto: prodId };
+        } else {
+          logError.error(" no hay productos")
+        }
+      } catch (error) {
+        logError.error(error);
+      }
 }
 
 // CREATE
 
-const newProduct = async (req, res) => {
-    const newProd = new Product(req.body)
+const newProduct = async (newProd) => {
     try {
-        const savedProduct = await newProd.save()
-        res.status(200).json(savedProduct)
+        const addProd = await prod.guardar(newProd);
+        return addProd;        
     } catch (error) {
-        res.status(500).json({message: "No se pudo crear el producto"})
+        logError.error(error);
     }
 }
 
 // UPDATE
 
-const updateProduct = async (req, res) => {
+const updateProduct = async (id, prodMod) => {
     try {
-        const updateProd = await Product.findByIdAndUpdate(
-            req.params.id,
-            {$set: req.body},
-            {new: true}
-        )
-        res.status(200).json(updateProd)
+        let flag = await prod.leerId(id);
+        if (Object.keys(flag).length != 0) {
+          const pto = await prod.actualizar(prodMod);
+          return { producto: pto };
+        } else {
+            logError.error(" oops, no existe producto ")
+        }
     } catch (error) {
-        res.status(500).json({message: "No se pudo actualizar el producto"})
+        logError.error(error);
     }
 }
 
-const deleteProduct = async (req, res) => {
+const deleteProduct = async (id) => {
     try {
-        await Product.findByIdAndUpdate(req.params.id)
-        res.status(200).json("Producto Eliminado")
-    } catch (error) {
-        res.status(500).json({message: "No se pudo eliminar el producto"})
-    }
+        let discard = await prod.leerId(id);
+    
+        if (Object.keys(discard).length != 0) {
+          await prod.eliminarId(id);
+          const prodsAll = await prod.leerALL();
+          return { productos: prodsAll };
+        } else {
+          return { estado: "ptoFalse" };
+        }
+      } catch (error) {
+        logError.error(error);
+      }
+    
 }
 
 module.exports = {

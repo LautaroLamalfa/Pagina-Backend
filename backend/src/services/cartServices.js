@@ -1,70 +1,112 @@
-const Cart = require("../models/cartData")
+const CartDao = require("../models/cartData")
+const ProductosDao = require('../models/productsData')
+const logs = require("../logs/log4");
 
-// CREATE
+const logConsola = logs.getLogger("console");
+const logError = logs.getLogger("error");
 
-const newCart = async (req, res) => {
-    const newProd = new Cart(req.body)
+
+let cart = new CartDao()
+let prod = new ProductosDao()
+
+
+const newCart = async () => {
     try {
-        const savedCart = await newProd.save()
-        res.status(200).json(savedCart)
+        let carrito = {
+            productos: []
+        }
+        let saved = await cart.guardar(carrito)
+        return { id: saved.id}
     } catch (error) {
-        res.status(500).json("error " + error)
+        logError.error(error)
     }
 }
 
-//  GET USER Cart
 
-const getOneFromCart = async (req, res) => {
+const checkProdFromCart = async (id) => {
     try {
-        const cart = await Cart.findOne({userId:req.params.UserId});
-
-        res.json(cart)
+        let carrito = await cart.leerId(id);
+        if (carrito) {
+            const prod = carrito.productos;
+            return { products: prod };
+          } else {
+              logError.error(" oops, no hay carrito ")
+          }
     } catch (error) {
-        res.status(500).json("error " + error)
+        logError.error(error)
     }
 }
 
-// GET ALL
-
-const getAllCarts = async (req, res) => {
+const checkCarts = async () => {
     try {
-        const carts = await Cart.find()
-        res.status(200).json(carts)
-    } catch (err) {
-        res.status(500).json("error " + err)
+        let prods = await cart.leerALL()
+        return prods    
+    } catch (error) {
+        logError.error(error)
     }
 }
 
-// UPDATE
 
-const updateCart = async (req, res) => {
+const prodToCart = async (idProd, idCart) => {
     try {
-        const updateCart = await Cart.findByIdAndUpdate(
-            req.params.id,
-            {$set: req.body},
-            {new: true}
-        )
-        res.status(200).json(updateCart)
+        let proId = await prod.leerId(idProd);
+        if (Object.keys(proId).length !=0) {
+            let carrito = await cart.leerId(idCart)
+                if (carrito) {
+                    carrito.prod.push(proId)
+                    cart.actualizar(carrito)
+                    return { carrito: carrito }
+                } else {
+                    logError.error("oops, no hay carrito")
+                }
+        } else {
+            logError.error("oops, no hay producto")
+        }
     } catch (error) {
-        res.status(500).json("error " + error)
+        logError.error(error)
     }
 }
 
-// DELETE
-
-const deleteCart = async (req, res) => {
+const deleteProdFromCart = async(idProd, idCart) => {
     try {
-        await Cart.findByIdAndUpdate(req.params.id)
-        res.status(200).json("Producto Eliminado")
+        let discardId = await cart.leerId(idCart)
+        if (Object.keys(discardId).length !=0) {
+            let products = discardId.prod
+            let index = products.findIndex((aux) => aux.id == idProd)
+            if (index >= 0) {
+                discardId.prod.splice(index, 1)
+                cart.actualizar(discardId)
+                return { carrito: discardId }
+            } else {
+                logError.error("oops, no hay producto")
+            }
+        } else {
+            logError.error("oops, no hay carrito")
+        }
     } catch (error) {
-        res.status(500).json("error " + error)
+        logError.error(error)
+    }
+}
+
+const deleteCart = async () => {
+    try {
+        let discard = await cart.leerId(id)
+        if (Object.keys(discard).length !=0) {
+            await cart.eliminarALL()
+            logConsola.info("Todo OK !")
+        } else { 
+            logError.error("oops, no hay carrito")
+         }
+    } catch (error) {
+        logError.error(error)
     }
 }
 
 module.exports = {
-    getAllCarts,
-    getOneFromCart,
     newCart,
-    updateCart,
-    deleteCart
+    checkCarts,
+    checkProdFromCart,
+    prodToCart,
+    deleteCart,
+    deleteProdFromCart
 }

@@ -1,62 +1,68 @@
-const Compra = require("../models/orderData")
+const OrderDao = require('../models/orderData');
+const logs = require ('../logs/log4')
+
+const logError = logs.getLogger("error");
+
+let order = new OrderDao()
 
 // CREATE
 
 const newOrder = async (req, res) => {
-    const newOrder = new Compra(req.body)
-    try {
-        const saveOrder = await newOrder.save()
-        res.status(200).json(saveOrder)
-    } catch (error) {
-        res.status(500).json("error " + error)
-    }
+  try {
+      const saveOrder = await order.guardar()
+      res.status(200).json(saveOrder)
+  } catch (error) {
+      logError.error(error);
+  }
 }
 
 //  GET 
 
-const getOrdersFromUser = async (req, res) => {
+const getOrdersFromUser = async (userId) => {
     try {
-        const order = await Compra.find({userId:req.params.UserId});
+        const ordersUser = await order.leerId(userId);
+        return ordersUser;
+      } catch (error) {
+        logError.error(error);
+      }
 
-        res.json(order)
-    } catch (error) {
-        console.error(error);
-        res.status(500).json("error " + error)
-    }
 }
 
-const getAllOrders = async (req, res) => {
+const getAllOrders = async () => {
     try {
-        const orders = await Compra.find()
-        res.status(200).json(orders)
-    } catch (err) {
-        res.status(500).json("error " + err)
-    }
+        const orders = order.leerALL();
+        return orders;
+      } catch (error) {
+        loggerError.error(error);
+      }
 }
 
 // UPDATE
 
-const updateOrder = async (req, res) => {
+const updateOrder = async (orderId, ordenMod) => {
     try {
-        const updateOrder = await Compra.findByIdAndUpdate(
-            req.params.id,
-            {$set: req.body},
-            {new: true}
-        )
-        res.status(200).json(updateOrder)
-    } catch (error) {
-        res.status(500).json("error " + error)
-    }
+        let update = await order.leerId(orderId);
+        if (Object.keys(update).length != 0) {
+          finalOrder = { ...ordenMod, timestamp: update.timestamp, user: update.user };
+          await order.actualizar(finalOrder);
+          return { order: order };
+        } else {
+            logError.error("oops, no hay orden")
+        }
+      } catch (error) {
+        logError.error(error);
+      }
 }
 
 // DELETE
 
-const deleteOrder = async (req, res) => {
+const deleteOrder = async () => {
     try {
-        await Compra.findByIdAndUpdate(req.params.id)
-        res.status(200).json("Producto Eliminado")
+        let discard = await order.eliminarALL()
+
+        return discard
     } catch (error) {
-        res.status(500).json("error " + error)
+        logError.error(error);
     }
 }
 
@@ -65,5 +71,5 @@ module.exports = {
     getOrdersFromUser,
     newOrder,
     updateOrder,
-    deleteOrder,
+    deleteOrder
 }

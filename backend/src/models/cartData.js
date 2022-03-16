@@ -1,24 +1,28 @@
-const { Schema, model } = require('mongoose');
+const ContenedorMongoDB = require ('./contenedor/mongoDB')
+const { Schema } = require('mongoose');
 
-const carritoSchema = new Schema({
-    userId:{ 
-        type: String,
-        required: true
-    },
-    productos: [
-        {
-            productId: {
-                type: String,
-            },
-            cantidad: {
-                type: Number,
-                default: 1,
+class CartDao extends ContenedorMongoDB {
+    
+    constructor() {
+    super('carrito', new Schema({
+        userId:{ 
+            type: String,
+            required: true
+        },
+        productos: [
+            {
+                productId: {
+                    type: String,
+                },
+                cantidad: {
+                    type: Number,
+                    default: 1,
+                }
             }
-        }
-    ]
-}, {timestamps: true}
-);
+        ]   
+    }, {timestamps: true}))
+    }
+}
 
-const Carrito = model('carrito', carritoSchema)
 
-module.exports = Carrito
+module.exports = CartDao

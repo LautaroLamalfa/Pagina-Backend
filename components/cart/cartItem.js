@@ -1,4 +1,4 @@
-import "../cart/cartItem.css"
+import "./cartItem.css"
 import { Link } from "react-router-dom"
 const CartItem = () => {
     return (

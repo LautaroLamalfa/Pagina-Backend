@@ -1,36 +1,54 @@
-const { Schema, model } = require('mongoose');
+const ContenedorMongoDB = require('./contenedor/mongoDB');
+const { Schema } = require('mongoose');
+const logs = require('../logs/log4')
 
-const ordenSchema = new Schema({
-    userId:{ 
-        type: String,
-        required: true
-    },
-    productos: [
-        {
-            productId: {
+const logError = logs.getLogger("error");
+
+class OrderDao extends ContenedorMongoDB {
+
+    constructor() {
+        super('ordenes', new Schema({
+            userId:{ 
                 type: String,
+                required: true
             },
-            cantidad: {
+            productos: [
+                {
+                    productId: {
+                        type: String,
+                    },
+                    cantidad: {
+                        type: Number,
+                        default: 1,
+                    }
+                }
+            ],
+            total: {
                 type: Number,
-                default: 1,
-            }
+                required: true
+            },
+            direccion: {
+                type: Object,
+                required: true,
+            },
+            status: {
+                type: String,
+                default: "pending"
+            },
+        }, {timestamps: true}))
+    }
+
+    getByUser = async(userId) =>{
+        try{
+            let docs = await super.leerALL();
+            const ordenesUser = docs.filter((n) => n.user === userId)
+            return ordenesUser;
         }
-    ],
-    total: {
-        type: Number,
-        required: true
-    },
-    direccion: {
-        type: Object,
-        required: true,
-    },
-    status: {
-        type: String,
-        default: "pending"
-    },
-}, {timestamps: true}
-);
+        catch(error){
+            logError.error(error)
+        }
+    }
+}
 
-const Orden = model('orden', ordenSchema)
 
-module.exports = Orden
+module.exports = OrderDao
