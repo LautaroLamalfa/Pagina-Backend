@@ -1,21 +1,19 @@
 const router = require("express").Router()
 
 const {
-    
     getAllOrders,
     getOrdersFromUser,
     newOrder,
     updateOrder,
-    deleteOrder
-    
+    deleteOrder 
 } = require ("../services/orderServices")
 
-const {verifyToken, admin, authorization } = require ("../services/verifyToken")
+const {isAdmin, isRegister} = require("../middleware/middleware");
 
-router.get("/:id", authorization, getOrdersFromUser)
-router.get("/", admin, getAllOrders)
-router.post("/", verifyToken, newOrder)
-router.put("/:id", admin, updateOrder)
-router.delete("/:id", admin, deleteOrder)
+router.get("/", isRegister, getOrdersFromUser)
+router.get("/all", isAdmin, getAllOrders)
+router.post("/:cartId", isRegister, newOrder)
+router.put("/:orderId", isAdmin, updateOrder)
+router.delete("/:orderId", isAdmin, deleteOrder)
 
 module.exports = router

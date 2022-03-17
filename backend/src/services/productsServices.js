@@ -31,6 +31,23 @@ const getOneProduct = async (id) => {
       }
 }
 
+// GET BY CATEGORY
+
+const getByCategory = async (categorías) =>{
+  try {
+    const ptosCat = await prod.getByCategory(categorías);
+
+    if (Object.keys(ptosCat).length != 0) {
+      return { estado: "ok", productos: ptosCat };
+    } else {
+      return { estado: "categoryFalse" };
+    }
+  } catch (error) {
+    logError.error(error);
+  }
+}
+
+
 // CREATE
 
 const newProduct = async (newProd) => {
@@ -78,6 +95,7 @@ const deleteProduct = async (id) => {
 module.exports = {
     getAllProducts,
     getOneProduct,
+    getByCategory,
     newProduct,
     updateProduct,
     deleteProduct

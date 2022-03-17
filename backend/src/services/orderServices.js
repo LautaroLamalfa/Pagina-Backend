@@ -20,7 +20,7 @@ const newOrder = async (req, res) => {
 
 const getOrdersFromUser = async (userId) => {
     try {
-        const ordersUser = await order.leerId(userId);
+        const ordersUser = await order.getByUser(userId);
         return ordersUser;
       } catch (error) {
         logError.error(error);

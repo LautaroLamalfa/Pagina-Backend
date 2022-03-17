@@ -6,9 +6,12 @@ const logs = require ("./logs/log4.js")
 const {isRegister} = require("./middleware/middleware");
 const passport = require("passport");
 const productsRoute = require("./routes/product")
-const register = require("./routes/user")
 const cartRoute = require("./routes/cart")
 const orderRoute = require("./routes/order")
+const chatRoute = require("./routes/chat")
+const login = require("./src/routes/login");
+const logout = require("./src/routes/logout");
+const register = require("./routes/register");
 require("dotenv").config();
 
 const logConsola = logs.getLogger("console");
@@ -23,9 +26,12 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(compression())
 app.use('/api', productsRoute)
-app.use('/auth', register)
-app.use('/api/cart', cartRoute)
-app.use('/api/order', orderRoute)
+app.use("/login", login);
+app.use('/auth', register);
+app.use("/logout", logout);
+app.use('/api/cart', cartRoute);
+app.use('/api/chat', chatRoute);
+app.use('/api/order', orderRoute);
 
 app.use(
     session({

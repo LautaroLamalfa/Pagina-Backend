@@ -1,21 +1,21 @@
 const router = require("express").Router()
 
 const {
-    
-    getAllCarts,
-    getOneFromCart,
-    newCart,
-    updateCart,
-    deleteCart
-    
-} = require ("../services/cartServices")
+    crearCarrito,
+    listarProductos,
+    listarCarritos,
+    agregarProducto,
+    eliminarProductoDeCarrito,
+    eliminarCarrito
+} = require ("../controllers/cartController")
 
-const {verifyToken, admin, authorization } = require ("../services/verifyToken")
+const {isAdmin, isRegister} = require("../middleware/middleware");
 
-router.get("/:id", authorization, getOneFromCart)
-router.get("/", admin, getAllCarts)
-router.post("/", verifyToken, newCart)
-router.put("/:id", authorization, updateCart)
-router.delete("/:id", authorization, deleteCart)
+router.get("/", isAdmin, listarCarritos)
+router.get("/:id", isRegister, listarProductos)
+router.post("/", isRegister, crearCarrito)
+router.post("/:cartId/:prodId", isRegister, agregarProducto)
+router.delete("/:id", isRegister, eliminarCarrito)
+router.delete("/:cartId/:prodId", isRegister, eliminarProductoDeCarrito)
 
 module.exports = router

@@ -5,7 +5,7 @@ const logs = require('../logs/log4')
 const logError = logs.getLogger("error");
 
 
-class userDao extends ContenedorMongoDB {
+class UserDao extends ContenedorMongoDB {
 
     constructor() {
         super('usuarios', new Schema({
@@ -26,7 +26,15 @@ class userDao extends ContenedorMongoDB {
             isAdmin: {
                 type:Boolean,
                 default: false
-            },        
+            },
+            carrito: {
+                type: Schema.ObjectId, 
+                ref: "carrito"
+            },
+            chat: {
+                type: Schema.ObjectId,
+                 ref: "chats"
+            }
         },{timestamps: true}))
     }
 
@@ -47,4 +55,4 @@ class userDao extends ContenedorMongoDB {
     }
 }
 
-module.exports = userDao
+module.exports = UserDao
