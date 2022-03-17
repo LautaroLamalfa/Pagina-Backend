@@ -47,7 +47,7 @@ app.use(passport.initialize());
 app.use(passport.session());
   
 app.use("/", isRegister, (req, res) => {
-    res.status(301).redirect("/")
+    res.status(301).redirect("/home.html")
 })
 
 app.use((req, res) => {
